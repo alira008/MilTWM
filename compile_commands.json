@@ -1,0 +1,50 @@
+[
+{
+  "directory": "C:/Users/ariel/dev/c-lang/MilTWM/build-debug",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\Llvm\\x64\\bin\\clang.exe -Dwm_dll_EXPORTS -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -o CMakeFiles\\wm_dll.dir\\src\\wm_dll.c.obj -c C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\wm_dll.c",
+  "file": "C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\wm_dll.c",
+  "output": "CMakeFiles\\wm_dll.dir\\src\\wm_dll.c.obj"
+},
+{
+  "directory": "C:/Users/ariel/dev/c-lang/MilTWM/build-debug",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\Llvm\\x64\\bin\\clang.exe -Dwm_dll_EXPORTS -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -o CMakeFiles\\wm_dll.dir\\src\\shared_memory.c.obj -c C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\shared_memory.c",
+  "file": "C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\shared_memory.c",
+  "output": "CMakeFiles\\wm_dll.dir\\src\\shared_memory.c.obj"
+},
+{
+  "directory": "C:/Users/ariel/dev/c-lang/MilTWM/build-debug",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\Llvm\\x64\\bin\\clang.exe -Dwm_dll_EXPORTS -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -o CMakeFiles\\wm_dll.dir\\src\\error.c.obj -c C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\error.c",
+  "file": "C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\error.c",
+  "output": "CMakeFiles\\wm_dll.dir\\src\\error.c.obj"
+},
+{
+  "directory": "C:/Users/ariel/dev/c-lang/MilTWM/build-debug",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\Llvm\\x64\\bin\\clang.exe -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -o CMakeFiles\\MilTWM.dir\\src\\main.c.obj -c C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\main.c",
+  "file": "C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\main.c",
+  "output": "CMakeFiles\\MilTWM.dir\\src\\main.c.obj"
+},
+{
+  "directory": "C:/Users/ariel/dev/c-lang/MilTWM/build-debug",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\Llvm\\x64\\bin\\clang.exe -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -o CMakeFiles\\MilTWM.dir\\src\\keyboard.c.obj -c C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\keyboard.c",
+  "file": "C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\keyboard.c",
+  "output": "CMakeFiles\\MilTWM.dir\\src\\keyboard.c.obj"
+},
+{
+  "directory": "C:/Users/ariel/dev/c-lang/MilTWM/build-debug",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\Llvm\\x64\\bin\\clang.exe -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -o CMakeFiles\\MilTWM.dir\\src\\error.c.obj -c C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\error.c",
+  "file": "C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\error.c",
+  "output": "CMakeFiles\\MilTWM.dir\\src\\error.c.obj"
+},
+{
+  "directory": "C:/Users/ariel/dev/c-lang/MilTWM/build-debug",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\Llvm\\x64\\bin\\clang.exe -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -o CMakeFiles\\MilTWM.dir\\src\\shared_memory.c.obj -c C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\shared_memory.c",
+  "file": "C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\shared_memory.c",
+  "output": "CMakeFiles\\MilTWM.dir\\src\\shared_memory.c.obj"
+},
+{
+  "directory": "C:/Users/ariel/dev/c-lang/MilTWM/build-debug",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\Llvm\\x64\\bin\\clang.exe -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -o CMakeFiles\\MilTWM.dir\\src\\tiling.c.obj -c C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\tiling.c",
+  "file": "C:\\Users\\ariel\\dev\\c-lang\\MilTWM\\src\\tiling.c",
+  "output": "CMakeFiles\\MilTWM.dir\\src\\tiling.c.obj"
+}
+]
