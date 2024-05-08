@@ -4,7 +4,6 @@
 #include "shared_memory.h"
 #include "tiling.h"
 #include <Windows.h>
-#include <processthreadsapi.h>
 #include <stdio.h>
 #include <stdlib.h>
 
