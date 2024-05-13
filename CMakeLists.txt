@@ -23,4 +23,4 @@ add_library(wm_dll SHARED src/wm_dll.c src/shared_memory.c src/error.c)
 target_link_libraries(wm_dll PRIVATE user32)
 
 add_executable(MilTWM src/main.c src/keyboard.c src/error.c src/shared_memory.c src/tiling.c)
-target_link_libraries(MilTWM PRIVATE kernel32 user32)
+target_link_libraries(MilTWM PRIVATE kernel32 user32 ole32)

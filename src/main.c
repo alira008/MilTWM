@@ -3,6 +3,7 @@
 #include "messages.h"
 #include "shared_memory.h"
 #include "tiling.h"
+#include <ShObjIdl.h>
 #include <Windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,6 +15,7 @@ int main() {
   int exit_code = EXIT_FAILURE;
   HMODULE wm_dll;
   HHOOK hook_shell_process_handle;
+  IVirtualDesktopManager *i_virtual_desktop_manager = NULL;
 
   HANDLE currently_running_mutex =
       CreateMutexW(NULL, TRUE, L"Global\\MilTWMIsCurrentlyRunning");
@@ -24,6 +26,19 @@ int main() {
 
   } else if (GetLastError() == ERROR_ALREADY_EXISTS) {
     DisplayError(L"MilTWM is already running, exiting");
+    goto cleanup;
+  }
+
+  if (FAILED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED))) {
+    DisplayError(L"Initation COM for Virtual desktop manager failed");
+    goto cleanup;
+  }
+
+  // initiate com of virtual desktop manager
+  if (FAILED(CoCreateInstance(&CLSID_VirtualDesktopManager, NULL,
+                              CLSCTX_INPROC_SERVER, &IID_IVirtualDesktopManager,
+                              (void **)&i_virtual_desktop_manager))) {
+    DisplayError(L"Initation COM for Virtual desktop manager failed");
     goto cleanup;
   }
 
@@ -62,7 +77,7 @@ int main() {
   }
 
   TilingTileWindows();
-  DisplayWindowNames();
+  DisplayWindowNames(i_virtual_desktop_manager);
 
   MSG msg;
 
@@ -78,12 +93,16 @@ int main() {
       break;
     case WM_WINDOW_EVENT:
       TilingTileWindows();
-      DisplayWindowNames();
+      DisplayWindowNames(i_virtual_desktop_manager);
       break;
     }
   }
 
 cleanup:
+  if (i_virtual_desktop_manager != NULL) {
+    i_virtual_desktop_manager->lpVtbl->Release(i_virtual_desktop_manager);
+    CoUninitialize();
+  }
   if (currently_running_mutex != NULL) {
     CloseHandle(currently_running_mutex);
   }
