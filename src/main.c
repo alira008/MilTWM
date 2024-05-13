@@ -84,7 +84,7 @@ int main() {
   }
 
   hook_window_pos_changed_proc_handle =
-      SetWindowsHookExW(WH_SHELL, (HOOKPROC)window_pos_changed_proc, wm_dll, 0);
+      SetWindowsHookExW(WH_CALLWNDPROC, (HOOKPROC)window_pos_changed_proc, wm_dll, 0);
 
   if (hook_window_pos_changed_proc_handle == NULL) {
     DisplayError(L"Could not SetWindowsHookExW for window pos changed hook");
@@ -106,14 +106,15 @@ int main() {
       KeyboardHandleHotkey(msg.wParam, msg.lParam);
       break;
     case WM_WINDOW_EVENT:
+      printf("\nwindow event\n");
       TilingTileWindows();
-      // DisplayWindowNames(i_virtual_desktop_manager);
+      DisplayWindowNames(i_virtual_desktop_manager);
       break;
     case WM_WINDOWPOSCHANGED:
-      wprintf(L"position or size of window changed");
+      printf("\nposition or size of window changed\n");
       break;
     case WM_SIZE:
-      wprintf(L"size of window changed");
+      printf("\nsize of window changed\n");
       break;
     }
   }

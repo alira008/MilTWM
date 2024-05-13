@@ -103,18 +103,18 @@ void DisplayWindowNames(IVirtualDesktopManager *i_virtual_desktop_manager) {
       continue;
     }
 
-    GUID desktopId = {0};
-    if (FAILED(i_virtual_desktop_manager->lpVtbl->GetWindowDesktopId(
-            i_virtual_desktop_manager, window, &desktopId))) {
-      wprintf(L"failed to call get window desktop id\n");
-      continue;
-    }
-    wprintf(L"guid of desktop: %lu-%hu-%hu-", desktopId.Data1, desktopId.Data2,
-            desktopId.Data3);
-    for (int i = 0; i < 8; ++i) {
-      wprintf(L"%X", desktopId.Data4[i]);
-    }
-    wprintf(L"\n");
+    // GUID desktopId = {0};
+    // if (FAILED(i_virtual_desktop_manager->lpVtbl->GetWindowDesktopId(
+    //         i_virtual_desktop_manager, window, &desktopId))) {
+    //   wprintf(L"failed to call get window desktop id\n");
+    //   continue;
+    // }
+    // wprintf(L"guid of desktop: %lu-%hu-%hu-", desktopId.Data1, desktopId.Data2,
+    //         desktopId.Data3);
+    // for (int i = 0; i < 8; ++i) {
+    //   wprintf(L"%X", desktopId.Data4[i]);
+    // }
+    // wprintf(L"\n");
 
     BOOL is_on_current_desktop = false;
     if (FAILED(
@@ -130,4 +130,5 @@ void DisplayWindowNames(IVirtualDesktopManager *i_virtual_desktop_manager) {
       // wprintf(L"handle: %s\n", temp_buf);
     }
   }
+  printf("end of displaying window names");
 }
