@@ -5,6 +5,19 @@
 
 DWORD wm_main_thread_id = 0;
 
+__declspec(dllexport) LRESULT CALLBACK WindowPosChangedProc(HWND hwnd,
+                                                            UINT message,
+                                                            WPARAM w_param,
+                                                            LPARAM l_param) {
+  if (message == WM_SIZE) {
+    PostThreadMessageW(wm_main_thread_id, message, w_param, l_param);
+  } else if (message == WM_WINDOWPOSCHANGED) {
+    PostThreadMessageW(wm_main_thread_id, message, w_param, l_param);
+  }
+
+  return DefWindowProc(hwnd, message, w_param, l_param);
+}
+
 __declspec(dllexport) LRESULT CALLBACK ShellProcess(int code, WPARAM w_param,
                                                     LPARAM l_param) {
   if (code == HSHELL_WINDOWCREATED || code == HSHELL_WINDOWDESTROYED) {

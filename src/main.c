@@ -14,7 +14,7 @@
 int main() {
   int exit_code = EXIT_FAILURE;
   HMODULE wm_dll;
-  HHOOK hook_shell_process_handle;
+  HHOOK hook_shell_process_handle, hook_window_pos_changed_proc_handle;
   IVirtualDesktopManager *i_virtual_desktop_manager = NULL;
 
   HANDLE currently_running_mutex =
@@ -76,6 +76,20 @@ int main() {
     goto cleanup;
   }
 
+  FARPROC window_pos_changed_proc = GetProcAddress(wm_dll, "WindowPosChangedProc");
+
+  if (window_pos_changed_proc == NULL) {
+    DisplayError(L"Could not get proc address for WindowPosChangedProc");
+    goto cleanup;
+  }
+
+  hook_window_pos_changed_proc_handle =
+      SetWindowsHookExW(WH_SHELL, (HOOKPROC)window_pos_changed_proc, wm_dll, 0);
+
+  if (hook_window_pos_changed_proc_handle == NULL) {
+    DisplayError(L"Could not SetWindowsHookExW for window pos changed hook");
+    goto cleanup;
+  }
   TilingTileWindows();
   DisplayWindowNames(i_virtual_desktop_manager);
 
@@ -93,7 +107,13 @@ int main() {
       break;
     case WM_WINDOW_EVENT:
       TilingTileWindows();
-      DisplayWindowNames(i_virtual_desktop_manager);
+      // DisplayWindowNames(i_virtual_desktop_manager);
+      break;
+    case WM_WINDOWPOSCHANGED:
+      wprintf(L"position or size of window changed");
+      break;
+    case WM_SIZE:
+      wprintf(L"size of window changed");
       break;
     }
   }
@@ -111,6 +131,10 @@ cleanup:
 
   if (hook_shell_process_handle) {
     UnhookWindowsHookEx(hook_shell_process_handle);
+  }
+
+  if (hook_window_pos_changed_proc_handle) {
+    UnhookWindowsHookEx(hook_window_pos_changed_proc_handle);
   }
 
   if (wm_dll) {
