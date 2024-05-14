@@ -130,5 +130,5 @@ void DisplayWindowNames(IVirtualDesktopManager *i_virtual_desktop_manager) {
       // wprintf(L"handle: %s\n", temp_buf);
     }
   }
-  printf("end of displaying window names");
+  printf("end of displaying window names\n");
 }

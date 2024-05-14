@@ -5,20 +5,19 @@
 
 DWORD wm_main_thread_id = 0;
 
-__declspec(dllexport) LRESULT CALLBACK WindowPosChangedProc(HWND hwnd,
-                                                            UINT message,
+__declspec(dllexport) LRESULT CALLBACK WindowPosChangedProc(int n_code,
                                                             WPARAM w_param,
                                                             LPARAM l_param) {
-  if (message == WM_MOVE) {
-    PostThreadMessageW(wm_main_thread_id, message, w_param, l_param);
-  } else if (message == WM_SIZE) {
-    PostThreadMessageW(wm_main_thread_id, message, w_param, l_param);
-  } else if (message == WM_WINDOWPOSCHANGED) {
-    PostThreadMessageW(wm_main_thread_id, message, w_param, l_param);
+  if (n_code == HC_ACTION) {
+    CWPSTRUCT *p_cwp = (CWPSTRUCT *)l_param;
+    if (p_cwp->message == WM_SIZE && p_cwp->wParam == SIZE_MAXIMIZED || p_cwp->wParam == SIZE_MINIMIZED || p_cwp->wParam == SIZE_RESTORED) {
+      PostThreadMessageW(wm_main_thread_id, WM_SIZE, p_cwp->wParam, p_cwp->lParam);
+    } else if (p_cwp->message == WM_MOVE) {
+      PostThreadMessageW(wm_main_thread_id, WM_MOVE, p_cwp->wParam, p_cwp->lParam);
+    }
   }
 
-  return DefWindowProc(hwnd, message, w_param, l_param);
-  // return 1;
+  return CallNextHookEx(NULL, n_code, w_param, l_param);
 }
 
 __declspec(dllexport) LRESULT CALLBACK ShellProcess(int code, WPARAM w_param,

@@ -76,15 +76,16 @@ int main() {
     goto cleanup;
   }
 
-  FARPROC window_pos_changed_proc = GetProcAddress(wm_dll, "WindowPosChangedProc");
+  FARPROC window_pos_changed_proc =
+      GetProcAddress(wm_dll, "WindowPosChangedProc");
 
   if (window_pos_changed_proc == NULL) {
     DisplayError(L"Could not get proc address for WindowPosChangedProc");
     goto cleanup;
   }
 
-  hook_window_pos_changed_proc_handle =
-      SetWindowsHookExW(WH_CALLWNDPROC, (HOOKPROC)window_pos_changed_proc, wm_dll, 0);
+  hook_window_pos_changed_proc_handle = SetWindowsHookExW(
+      WH_CALLWNDPROC, (HOOKPROC)window_pos_changed_proc, wm_dll, 0);
 
   if (hook_window_pos_changed_proc_handle == NULL) {
     DisplayError(L"Could not SetWindowsHookExW for window pos changed hook");
@@ -106,15 +107,19 @@ int main() {
       KeyboardHandleHotkey(msg.wParam, msg.lParam);
       break;
     case WM_WINDOW_EVENT:
-      printf("\nwindow event\n");
+      printf("window event\n");
       TilingTileWindows();
       DisplayWindowNames(i_virtual_desktop_manager);
       break;
-    case WM_WINDOWPOSCHANGED:
-      printf("\nposition or size of window changed\n");
-      break;
     case WM_SIZE:
-      printf("\nsize of window changed\n");
+      if (msg.wParam == SIZE_MAXIMIZED || msg.wParam == SIZE_MINIMIZED ||
+          msg.wParam == SIZE_RESTORED) {
+        printf("size of window changed\n");
+      }
+
+      break;
+    case WM_MOVE:
+      printf("position of window changed\n");
       break;
     }
   }
@@ -139,6 +144,7 @@ cleanup:
   }
 
   if (wm_dll) {
+    printf("freeing library");
     FreeLibrary(wm_dll);
   }
 
