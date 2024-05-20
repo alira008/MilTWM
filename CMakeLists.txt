@@ -14,5 +14,5 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(MilTWM)
 
-add_executable(MilTWM src/main.c src/keyboard.c src/error.c src/tiling.c)
+add_executable(MilTWM src/main.c src/keyboard.c src/error.c src/tiling.c src/linked_list.c)
 target_link_libraries(MilTWM PRIVATE kernel32 user32 ole32)
