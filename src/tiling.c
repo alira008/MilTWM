@@ -120,15 +120,15 @@ void DisplayWindowNames(IVirtualDesktopManager *i_virtual_desktop_manager) {
     if (FAILED(
             i_virtual_desktop_manager->lpVtbl->IsWindowOnCurrentVirtualDesktop(
                 i_virtual_desktop_manager, window, &is_on_current_desktop))) {
-      wprintf(L"failed to call is window on current virtual desktop\n");
-      wprintf(L"handle: %s", temp_buf);
+      // wprintf(L"failed to call is window on current virtual desktop\n");
+      // wprintf(L"handle: %s", temp_buf);
       continue;
     }
     if (is_on_current_desktop) {
-      wprintf(L"handle: %s is on current desktop\n", temp_buf);
+      // wprintf(L"handle: %s is on current desktop\n", temp_buf);
     } else {
       // wprintf(L"handle: %s\n", temp_buf);
     }
   }
-  printf("end of displaying window names\n");
+  // printf("end of displaying window names\n");
 }

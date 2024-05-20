@@ -1,33 +1,22 @@
 #include "error.h"
 #include "keyboard.h"
 #include "messages.h"
-#include "shared_memory.h"
 #include "tiling.h"
 #include <ShObjIdl.h>
 #include <Windows.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+void win_event_proc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd,
+                    LONG idObject, LONG idChild, DWORD idEventThread,
+                    DWORD dwmsEventTime);
 // int WINAPI wWinMain(HINSTANCE instance, HINSTANCE prevInstance, PWSTR
 // cmdLIine,
 //                     int cmdShow) {
 int main() {
   int exit_code = EXIT_FAILURE;
-  HMODULE wm_dll;
-  HHOOK hook_shell_process_handle, hook_window_pos_changed_proc_handle;
   IVirtualDesktopManager *i_virtual_desktop_manager = NULL;
-
-  HANDLE currently_running_mutex =
-      CreateMutexW(NULL, TRUE, L"Global\\MilTWMIsCurrentlyRunning");
-
-  if (currently_running_mutex == NULL) {
-    DisplayError(L"MilTWM failed creating currently running mutex");
-    goto cleanup;
-
-  } else if (GetLastError() == ERROR_ALREADY_EXISTS) {
-    DisplayError(L"MilTWM is already running, exiting");
-    goto cleanup;
-  }
 
   if (FAILED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED))) {
     DisplayError(L"Initation COM for Virtual desktop manager failed");
@@ -49,54 +38,19 @@ int main() {
     goto cleanup;
   }
 
-  if (!StoreDwordIntoSharedMemory(GetCurrentThreadId())) {
-    DisplayError(L"Could not write thread id into shared memory");
+  HWINEVENTHOOK win_event_hook =
+      SetWinEventHook(EVENT_MIN, EVENT_MAX, NULL, win_event_proc, 0, 0, 0);
+  if (!win_event_hook) {
+    DisplayError(L"Could not hook win event proc");
     goto cleanup;
   }
 
-  wm_dll = LoadLibraryW(L"wm_dll");
-
-  if (wm_dll == NULL) {
-    DisplayError(L"Could not load library wm_dll");
-    goto cleanup;
-  }
-
-  FARPROC shell_process = GetProcAddress(wm_dll, "ShellProcess");
-
-  if (shell_process == NULL) {
-    DisplayError(L"Could not get proc address for ShellProcess");
-    goto cleanup;
-  }
-
-  hook_shell_process_handle =
-      SetWindowsHookExW(WH_SHELL, (HOOKPROC)shell_process, wm_dll, 0);
-
-  if (hook_shell_process_handle == NULL) {
-    DisplayError(L"Could not SetWindowsHookExW for shell hook");
-    goto cleanup;
-  }
-
-  FARPROC window_pos_changed_proc =
-      GetProcAddress(wm_dll, "WindowPosChangedProc");
-
-  if (window_pos_changed_proc == NULL) {
-    DisplayError(L"Could not get proc address for WindowPosChangedProc");
-    goto cleanup;
-  }
-
-  hook_window_pos_changed_proc_handle = SetWindowsHookExW(
-      WH_CALLWNDPROC, (HOOKPROC)window_pos_changed_proc, wm_dll, 0);
-
-  if (hook_window_pos_changed_proc_handle == NULL) {
-    DisplayError(L"Could not SetWindowsHookExW for window pos changed hook");
-    goto cleanup;
-  }
   TilingTileWindows();
   DisplayWindowNames(i_virtual_desktop_manager);
 
   MSG msg;
 
-  while (GetMessage(&msg, (HWND)-1, 0, 0) != 0) {
+  while (GetMessage(&msg, 0, 0, 0) != 0) {
     switch (msg.message) {
     case WM_HOTKEY:
       if (msg.wParam == QUIT_MILTWM_HOTKEY_ID) {
@@ -111,17 +65,9 @@ int main() {
       TilingTileWindows();
       DisplayWindowNames(i_virtual_desktop_manager);
       break;
-    case WM_SIZE:
-      if (msg.wParam == SIZE_MAXIMIZED || msg.wParam == SIZE_MINIMIZED ||
-          msg.wParam == SIZE_RESTORED) {
-        printf("size of window changed\n");
-      }
-
-      break;
-    case WM_MOVE:
-      printf("position of window changed\n");
-      break;
     }
+    TranslateMessage(&msg);
+    DispatchMessageW(&msg);
   }
 
 cleanup:
@@ -129,24 +75,49 @@ cleanup:
     i_virtual_desktop_manager->lpVtbl->Release(i_virtual_desktop_manager);
     CoUninitialize();
   }
-  if (currently_running_mutex != NULL) {
-    CloseHandle(currently_running_mutex);
-  }
 
   KeyboardCleanup();
 
-  if (hook_shell_process_handle) {
-    UnhookWindowsHookEx(hook_shell_process_handle);
-  }
-
-  if (hook_window_pos_changed_proc_handle) {
-    UnhookWindowsHookEx(hook_window_pos_changed_proc_handle);
-  }
-
-  if (wm_dll) {
-    printf("freeing library");
-    FreeLibrary(wm_dll);
+  if (win_event_hook) {
+    UnhookWinEvent(win_event_hook);
   }
 
   return exit_code;
+}
+
+void win_event_proc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd,
+                    LONG idObject, LONG idChild, DWORD idEventThread,
+                    DWORD dwmsEventTime) {
+  WCHAR temp_buf[256] = {};
+  HWND window = hwnd;
+  int len_of_wchar = GetWindowTextW(window, temp_buf, 256);
+  if (len_of_wchar == 0) {
+    return;
+  }
+  if (event == EVENT_OBJECT_CREATE) {
+    wprintf(L"event: object created: %s\n", temp_buf);
+  } else if (event == EVENT_OBJECT_DESTROY) {
+    printf("event: object destroyed\n");
+  } else if (event == EVENT_OBJECT_HIDE) {
+    printf("event: object hidden\n");
+  } else if (event == EVENT_OBJECT_CLOAKED) {
+    printf("event: object cloaked\n");
+  } else if (event == EVENT_SYSTEM_MINIMIZESTART) {
+    printf("event: object system minimize start\n");
+  } else if (event == EVENT_OBJECT_SHOW || event == EVENT_SYSTEM_MINIMIZEEND) {
+    printf("event: object show\n");
+  } else if (event == EVENT_OBJECT_UNCLOAKED) {
+    printf("event: object uncloaked\n");
+  } else if (event == EVENT_OBJECT_FOCUS || event == EVENT_SYSTEM_FOREGROUND) {
+    printf("event: object focused\n");
+  } else if (event == EVENT_SYSTEM_MOVESIZESTART) {
+    printf("event: object system move start\n");
+  } else if (event == EVENT_SYSTEM_MOVESIZEEND) {
+    printf("event: object system move end\n");
+  } else if (event == EVENT_SYSTEM_CAPTURESTART ||
+             event == EVENT_SYSTEM_CAPTUREEND) {
+    wprintf(L"event: object mouse capture\n");
+  } else if (event == EVENT_OBJECT_NAMECHANGE) {
+    // wprintf(L"event: object name change\n");
+  }
 }
