@@ -52,7 +52,6 @@ int main() {
 
   MSG msg;
   DoublyLinkedList *list = doubly_linked_list_init();
-  doubly_linked_list_pop_front(list);
   doubly_linked_list_destroy(list);
 
   while (GetMessage(&msg, 0, 0, 0) != 0) {
