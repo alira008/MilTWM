@@ -1,3 +1,4 @@
+#include "doublylinkedlist.h"
 #include "error.h"
 #include "keyboard.h"
 #include "messages.h"
@@ -17,6 +18,7 @@ void win_event_proc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd,
 int main() {
   int exit_code = EXIT_FAILURE;
   IVirtualDesktopManager *i_virtual_desktop_manager = NULL;
+  HWINEVENTHOOK win_event_hook = NULL;
 
   if (FAILED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED))) {
     DisplayError(L"Initation COM for Virtual desktop manager failed");
@@ -38,7 +40,7 @@ int main() {
     goto cleanup;
   }
 
-  HWINEVENTHOOK win_event_hook =
+  win_event_hook =
       SetWinEventHook(EVENT_MIN, EVENT_MAX, NULL, win_event_proc, 0, 0, 0);
   if (!win_event_hook) {
     DisplayError(L"Could not hook win event proc");
@@ -49,6 +51,9 @@ int main() {
   DisplayWindowNames(i_virtual_desktop_manager);
 
   MSG msg;
+  DoublyLinkedList *list = doubly_linked_list_init();
+  doubly_linked_list_pop_front(list);
+  doubly_linked_list_destroy(list);
 
   while (GetMessage(&msg, 0, 0, 0) != 0) {
     switch (msg.message) {
