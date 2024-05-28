@@ -51,8 +51,6 @@ int main() {
   DisplayWindowNames(i_virtual_desktop_manager);
 
   MSG msg;
-  DoublyLinkedList *list = doubly_linked_list_init();
-  doubly_linked_list_destroy(list);
 
   while (GetMessage(&msg, 0, 0, 0) != 0) {
     switch (msg.message) {
@@ -93,13 +91,17 @@ void win_event_proc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd,
                     LONG idObject, LONG idChild, DWORD idEventThread,
                     DWORD dwmsEventTime) {
   WCHAR temp_buf[256] = {};
+  WCHAR temp_buf2[256] = {};
   HWND window = hwnd;
   int len_of_wchar = GetWindowTextW(window, temp_buf, 256);
   if (len_of_wchar == 0) {
     return;
   }
   if (event == EVENT_OBJECT_CREATE) {
-    wprintf(L"event: object created: %s\n", temp_buf);
+    int len_of_win_class = RealGetWindowClassW(window, temp_buf2, 256);
+    if (wcscmp(temp_buf2, L"OleMainThreadWndClass") != 0) {
+      wprintf(L"event: object created: %s\n", temp_buf);
+    }
   } else if (event == EVENT_OBJECT_DESTROY) {
     printf("event: object destroyed\n");
   } else if (event == EVENT_OBJECT_HIDE) {
