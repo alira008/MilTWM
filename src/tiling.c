@@ -93,7 +93,7 @@ void TilingFocusNextWindow(bool back) {
   SwitchToThisWindow(g_managed_windows[g_current_focused_window_index], FALSE);
 }
 
-void DisplayWindowNames(IVirtualDesktopManager *i_virtual_desktop_manager) {
+void DisplayWindowNames() {
   printf("number of managed windows: %d\n", g_number_of_managed_windows);
   for (int i = 0; i < g_number_of_managed_windows; ++i) {
     WCHAR temp_buf[256] = {};
@@ -102,33 +102,5 @@ void DisplayWindowNames(IVirtualDesktopManager *i_virtual_desktop_manager) {
     if (len_of_wchar == 0) {
       continue;
     }
-
-    // GUID desktopId = {0};
-    // if (FAILED(i_virtual_desktop_manager->lpVtbl->GetWindowDesktopId(
-    //         i_virtual_desktop_manager, window, &desktopId))) {
-    //   wprintf(L"failed to call get window desktop id\n");
-    //   continue;
-    // }
-    // wprintf(L"guid of desktop: %lu-%hu-%hu-", desktopId.Data1, desktopId.Data2,
-    //         desktopId.Data3);
-    // for (int i = 0; i < 8; ++i) {
-    //   wprintf(L"%X", desktopId.Data4[i]);
-    // }
-    // wprintf(L"\n");
-
-    BOOL is_on_current_desktop = false;
-    if (FAILED(
-            i_virtual_desktop_manager->lpVtbl->IsWindowOnCurrentVirtualDesktop(
-                i_virtual_desktop_manager, window, &is_on_current_desktop))) {
-      // wprintf(L"failed to call is window on current virtual desktop\n");
-      // wprintf(L"handle: %s", temp_buf);
-      continue;
-    }
-    if (is_on_current_desktop) {
-      // wprintf(L"handle: %s is on current desktop\n", temp_buf);
-    } else {
-      // wprintf(L"handle: %s\n", temp_buf);
-    }
   }
-  // printf("end of displaying window names\n");
 }

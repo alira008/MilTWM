@@ -1,6 +1,5 @@
 #include "channel.h"
 #include "queue.h"
-#include <synchapi.h>
 
 Channel *channel_new(size_t capacity) {
   Channel *channel = malloc(sizeof(Channel));

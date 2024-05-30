@@ -5,6 +5,7 @@
 #include "tiling.h"
 #include <ShObjIdl.h>
 #include <Windows.h>
+#include <dwmapi.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,21 +18,7 @@ void win_event_proc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd,
 //                     int cmdShow) {
 int main() {
   int exit_code = EXIT_FAILURE;
-  IVirtualDesktopManager *i_virtual_desktop_manager = NULL;
   HWINEVENTHOOK win_event_hook = NULL;
-
-  if (FAILED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED))) {
-    DisplayError(L"Initation COM for Virtual desktop manager failed");
-    goto cleanup;
-  }
-
-  // initiate com of virtual desktop manager
-  if (FAILED(CoCreateInstance(&CLSID_VirtualDesktopManager, NULL,
-                              CLSCTX_INPROC_SERVER, &IID_IVirtualDesktopManager,
-                              (void **)&i_virtual_desktop_manager))) {
-    DisplayError(L"Initation COM for Virtual desktop manager failed");
-    goto cleanup;
-  }
 
   SetProcessDPIAware();
 
@@ -48,7 +35,7 @@ int main() {
   }
 
   TilingTileWindows();
-  DisplayWindowNames(i_virtual_desktop_manager);
+  DisplayWindowNames();
 
   MSG msg;
 
@@ -65,7 +52,7 @@ int main() {
     case WM_WINDOW_EVENT:
       printf("window event\n");
       TilingTileWindows();
-      DisplayWindowNames(i_virtual_desktop_manager);
+      DisplayWindowNames();
       break;
     }
     TranslateMessage(&msg);
@@ -73,11 +60,6 @@ int main() {
   }
 
 cleanup:
-  if (i_virtual_desktop_manager != NULL) {
-    i_virtual_desktop_manager->lpVtbl->Release(i_virtual_desktop_manager);
-    CoUninitialize();
-  }
-
   KeyboardCleanup();
 
   if (win_event_hook) {
@@ -87,43 +69,46 @@ cleanup:
   return exit_code;
 }
 
+BOOL IsWindowCloaked(HWND hwnd) {
+  BOOL is_cloaked = false;
+
+  return (SUCCEEDED(DwmGetWindowAttribute(hwnd, DWMWA_CLOAKED, &is_cloaked,
+                                          sizeof(is_cloaked)))) &&
+         is_cloaked;
+}
+
 void win_event_proc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd,
                     LONG idObject, LONG idChild, DWORD idEventThread,
                     DWORD dwmsEventTime) {
-  WCHAR temp_buf[256] = {};
-  WCHAR temp_buf2[256] = {};
+  WCHAR window_title_buf[256] = {};
+  WCHAR window_class_buf[256] = {};
   HWND window = hwnd;
-  int len_of_wchar = GetWindowTextW(window, temp_buf, 256);
+  int len_of_wchar = GetWindowTextW(window, window_title_buf, 256);
   if (len_of_wchar == 0) {
     return;
   }
   if (event == EVENT_OBJECT_CREATE) {
-    int len_of_win_class = RealGetWindowClassW(window, temp_buf2, 256);
-    if (wcscmp(temp_buf2, L"OleMainThreadWndClass") != 0) {
-      wprintf(L"event: object created: %s\n", temp_buf);
+    int len_of_win_class = RealGetWindowClassW(window, window_class_buf, 256);
+    bool is_cloaked = IsWindowCloaked(window);
+    if (!IsWindow(window) || len_of_win_class == 0) {
+      return;
+    }
+
+    if (wcscmp(window_class_buf, L"OleMainThreadWndClass") != 0) {
+      wprintf(L"event: object created: %s, addr: %p\n", window_title_buf,
+              window);
     }
   } else if (event == EVENT_OBJECT_DESTROY) {
-    printf("event: object destroyed\n");
   } else if (event == EVENT_OBJECT_HIDE) {
-    printf("event: object hidden\n");
   } else if (event == EVENT_OBJECT_CLOAKED) {
-    printf("event: object cloaked\n");
   } else if (event == EVENT_SYSTEM_MINIMIZESTART) {
-    printf("event: object system minimize start\n");
   } else if (event == EVENT_OBJECT_SHOW || event == EVENT_SYSTEM_MINIMIZEEND) {
-    printf("event: object show\n");
   } else if (event == EVENT_OBJECT_UNCLOAKED) {
-    printf("event: object uncloaked\n");
   } else if (event == EVENT_OBJECT_FOCUS || event == EVENT_SYSTEM_FOREGROUND) {
-    printf("event: object focused\n");
   } else if (event == EVENT_SYSTEM_MOVESIZESTART) {
-    printf("event: object system move start\n");
   } else if (event == EVENT_SYSTEM_MOVESIZEEND) {
-    printf("event: object system move end\n");
   } else if (event == EVENT_SYSTEM_CAPTURESTART ||
              event == EVENT_SYSTEM_CAPTUREEND) {
-    wprintf(L"event: object mouse capture\n");
   } else if (event == EVENT_OBJECT_NAMECHANGE) {
-    // wprintf(L"event: object name change\n");
   }
 }

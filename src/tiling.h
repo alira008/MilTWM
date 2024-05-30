@@ -7,4 +7,4 @@
 void TilingTileWindows();
 void TilingToggleFocusedWindow(HWND);
 void TilingFocusNextWindow(bool);
-void DisplayWindowNames(IVirtualDesktopManager *);
+void DisplayWindowNames();
